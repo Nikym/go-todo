@@ -117,3 +117,40 @@ func TestService_Create(t *testing.T) {
 		})
 	}
 }
+
+func TestService_Delete(t *testing.T) {
+	tests := []struct {
+		name  string
+		input string
+		err   bool
+	}{
+		{
+			name:  "should return no error when valid id is given",
+			input: "154b07a0-76bd-4f85-83a5-5090cbf46552",
+			err:   false,
+		},
+		{
+			name:  "should return error when invalid id is given",
+			input: "invalid",
+			err:   true,
+		},
+	}
+
+	mockEntryRepository := &ports.MockEntryRepository{}
+	mockEntryRepository.
+		On("Delete", "154b07a0-76bd-4f85-83a5-5090cbf46552").
+		Return(nil)
+	mockEntryRepository.
+		On("Delete", "invalid").
+		Return(errors.New("error"))
+
+	service := New(mockEntryRepository)
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			err := service.Delete(test.input)
+
+			assert.Equal(t, test.err, err != nil)
+		})
+	}
+}

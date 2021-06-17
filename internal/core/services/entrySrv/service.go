@@ -40,3 +40,12 @@ func (srv *service) Create(title, description string) (*domain.Entry, error) {
 
 	return entry, nil
 }
+
+// Delete removes an Entry (domain.Entry) from the entry repository.
+func (srv *service) Delete(id string) error {
+	if err := srv.entryRepository.Delete(id); err != nil {
+		return err
+	}
+
+	return nil
+}
