@@ -3,6 +3,7 @@ package entrySrv
 import (
 	"errors"
 	"github.com/Nikym/go-todo/internal/core/domain"
+	"github.com/Nikym/go-todo/internal/core/ports"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"testing"
@@ -13,25 +14,6 @@ type TestEntry struct {
 	Input    interface{}
 	Expected interface{}
 	Err      bool
-}
-
-type MockEntryRepository struct {
-	mock.Mock
-}
-
-func (m *MockEntryRepository) Get(id string) (*domain.Entry, error) {
-	args := m.Called(id)
-	return args.Get(0).(*domain.Entry), args.Error(1)
-}
-
-func (m *MockEntryRepository) Save(entry *domain.Entry) error {
-	args := m.Called(entry)
-	return args.Error(0)
-}
-
-func (m *MockEntryRepository) Delete(id string) error {
-	args := m.Called(id)
-	return args.Error(0)
 }
 
 func TestService_Get(t *testing.T) {
@@ -55,7 +37,7 @@ func TestService_Get(t *testing.T) {
 		},
 	}
 
-	mockEntryRepository := &MockEntryRepository{}
+	mockEntryRepository := &ports.MockEntryRepository{}
 	mockEntryRepository.
 		On("Get", "17beccd2-c5e8-4744-9b5f-98163b4a479d").
 		Return(&domain.Entry{
@@ -66,7 +48,7 @@ func TestService_Get(t *testing.T) {
 		}, nil)
 	mockEntryRepository.
 		On("Get", "invalid").
-		Return(&domain.Entry{}, errors.New("error"))
+		Return(&domain.Entry{}, errors.New("error get"))
 
 	service := New(mockEntryRepository)
 
@@ -76,6 +58,67 @@ func TestService_Get(t *testing.T) {
 
 			assert.EqualValues(t, test.Expected, actual)
 			assert.Equal(t, test.Err, err != nil)
+		})
+	}
+}
+
+func TestService_Create(t *testing.T) {
+	type input struct {
+		title       string
+		description string
+	}
+	tests := []TestEntry{
+		{
+			Name: "should create new entry and return domain.Entry object on valid input",
+			Input: input{
+				title:       "Test Title",
+				description: "Test Description",
+			},
+			Expected: &domain.Entry{
+				Title:       "Test Title",
+				Description: "Test Description",
+				Done:        false,
+			},
+			Err: false,
+		},
+		{
+			Name: "should return error when repository cannot be accessed",
+			Input: input{
+				title:       "Error",
+				description: "Error",
+			},
+			Expected: &domain.Entry{},
+			Err:      true,
+		},
+	}
+
+	mockEntryRepository := &ports.MockEntryRepository{}
+	mockEntryRepository.
+		On("Save", mock.MatchedBy(
+			func(e *domain.Entry) bool { return e.Title == "Test Title" && e.Description == "Test Description" }),
+		).
+		Return(nil)
+	mockEntryRepository.
+		On("Save", mock.MatchedBy(
+			func(e *domain.Entry) bool { return e.Title == "Error" && e.Description == "Error" }),
+		).
+		Return(errors.New("error create"))
+
+	service := New(mockEntryRepository)
+
+	for _, test := range tests {
+		in := test.Input.(input)
+		t.Run(test.Name, func(t *testing.T) {
+			actual, err := service.Create(in.title, in.description)
+			if err != nil {
+				assert.True(t, test.Err)
+			} else {
+				expected := test.Expected.(*domain.Entry)
+
+				assert.IsType(t, &domain.Entry{}, actual)
+				assert.Equal(t, expected.Title, actual.Title)
+				assert.Equal(t, expected.Description, actual.Description)
+			}
 		})
 	}
 }
