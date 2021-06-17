@@ -2,8 +2,8 @@ package entrySrv
 
 import (
 	"errors"
-	"github.com/Nikym/go-todo/pkg/core/domain"
-	"github.com/Nikym/go-todo/pkg/core/ports"
+	"github.com/Nikym/go-todo/internal/core/domain"
+	"github.com/Nikym/go-todo/internal/core/ports"
 )
 
 type service struct {

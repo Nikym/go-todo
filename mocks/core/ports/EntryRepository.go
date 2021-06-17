@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	domain "github.com/Nikym/go-todo/pkg/core/domain"
+	domain "github.com/Nikym/go-todo/internal/core/domain"
 	mock "github.com/stretchr/testify/mock"
 )
 

@@ -2,8 +2,8 @@ package entrySrv
 
 import (
 	"errors"
-	"github.com/Nikym/go-todo/mocks/pkg/core/ports"
-	"github.com/Nikym/go-todo/pkg/core/domain"
+	"github.com/Nikym/go-todo/internal/core/domain"
+	"github.com/Nikym/go-todo/mocks/core/ports"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"testing"
