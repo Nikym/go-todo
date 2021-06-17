@@ -2,15 +2,15 @@ package entrySrv
 
 import (
 	"errors"
-	"github.com/Nikym/go-todo/internal/core/domain"
-	"github.com/Nikym/go-todo/internal/core/ports"
+	"github.com/Nikym/go-todo/pkg/core/domain"
+	"github.com/Nikym/go-todo/pkg/core/ports"
 )
 
 type service struct {
 	entryRepository ports.EntryRepository
 }
 
-// New returns a pointer to a new service object.
+// New returns a pointer to a new entry service object.
 func New(repository ports.EntryRepository) *service {
 	return &service{
 		entryRepository: repository,

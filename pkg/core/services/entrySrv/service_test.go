@@ -2,8 +2,8 @@ package entrySrv
 
 import (
 	"errors"
-	"github.com/Nikym/go-todo/internal/core/domain"
-	"github.com/Nikym/go-todo/internal/core/ports"
+	"github.com/Nikym/go-todo/mocks/pkg/core/ports"
+	"github.com/Nikym/go-todo/pkg/core/domain"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"testing"
@@ -31,7 +31,7 @@ func TestService_Get(t *testing.T) {
 		},
 	}
 
-	mockEntryRepository := &ports.MockEntryRepository{}
+	mockEntryRepository := &mocks.EntryRepository{}
 	mockEntryRepository.
 		On("Get", "17beccd2-c5e8-4744-9b5f-98163b4a479d").
 		Return(&domain.Entry{
@@ -90,7 +90,7 @@ func TestService_Create(t *testing.T) {
 		},
 	}
 
-	mockEntryRepository := &ports.MockEntryRepository{}
+	mockEntryRepository := &mocks.EntryRepository{}
 	mockEntryRepository.
 		On("Save", mock.MatchedBy(
 			func(e *domain.Entry) bool { return e.Title == "Test Title" && e.Description == "Test Description" }),
@@ -136,7 +136,7 @@ func TestService_Delete(t *testing.T) {
 		},
 	}
 
-	mockEntryRepository := &ports.MockEntryRepository{}
+	mockEntryRepository := &mocks.EntryRepository{}
 	mockEntryRepository.
 		On("Delete", "154b07a0-76bd-4f85-83a5-5090cbf46552").
 		Return(nil)
@@ -186,7 +186,7 @@ func TestService_Update(t *testing.T) {
 		},
 	}
 
-	mockEntryRepository := &ports.MockEntryRepository{}
+	mockEntryRepository := &mocks.EntryRepository{}
 	mockEntryRepository.
 		On("Update", "154b07a0-76bd-4f85-83a5-5090cbf46552", mock.MatchedBy(
 			func(e *domain.Entry) bool { return true },

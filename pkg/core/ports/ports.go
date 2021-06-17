@@ -1,6 +1,6 @@
 package ports
 
-import "github.com/Nikym/go-todo/internal/core/domain"
+import "github.com/Nikym/go-todo/pkg/core/domain"
 
 // EntryRepository is the interface for the repository port handling the
 // retrieval and storage of to-do entries.
