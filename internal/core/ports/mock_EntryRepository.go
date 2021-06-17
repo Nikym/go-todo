@@ -62,3 +62,17 @@ func (_m *MockEntryRepository) Save(entry *domain.Entry) error {
 
 	return r0
 }
+
+// Update provides a mock function with given fields: id, entry
+func (_m *MockEntryRepository) Update(id string, entry *domain.Entry) error {
+	ret := _m.Called(id, entry)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(string, *domain.Entry) error); ok {
+		r0 = rf(id, entry)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}

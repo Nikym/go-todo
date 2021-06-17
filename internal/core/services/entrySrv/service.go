@@ -49,3 +49,12 @@ func (srv *service) Delete(id string) error {
 
 	return nil
 }
+
+// Update the entry with the given UUID to the values of the specified domain.Entry object.
+func (srv *service) Update(id string, entry *domain.Entry) error {
+	if err := srv.entryRepository.Update(id, entry); err != nil {
+		return err
+	}
+
+	return nil
+}

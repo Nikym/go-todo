@@ -8,6 +8,7 @@ type EntryRepository interface {
 	Get(id string) (*domain.Entry, error)
 	Save(entry *domain.Entry) error
 	Delete(id string) error
+	Update(id string, entry *domain.Entry) error
 }
 
 // EntryService is the interface for the driver port handling the

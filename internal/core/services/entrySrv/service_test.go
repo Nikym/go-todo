@@ -154,3 +154,56 @@ func TestService_Delete(t *testing.T) {
 		})
 	}
 }
+
+func TestService_Update(t *testing.T) {
+	tests := []struct {
+		name       string
+		inputId    string
+		inputEntry *domain.Entry
+		err        bool
+	}{
+		{
+			name:    "should return no error when id is valid",
+			inputId: "154b07a0-76bd-4f85-83a5-5090cbf46552",
+			inputEntry: &domain.Entry{
+				ID:          "154b07a0-76bd-4f85-83a5-5090cbf46552",
+				Title:       "Test Title",
+				Description: "Test Description",
+				Done:        false,
+			},
+			err: false,
+		},
+		{
+			name:    "should return error when id is invalid",
+			inputId: "invalid",
+			inputEntry: &domain.Entry{
+				ID:          "invalid",
+				Title:       "Test Title",
+				Description: "Test Description",
+				Done:        false,
+			},
+			err: true,
+		},
+	}
+
+	mockEntryRepository := &ports.MockEntryRepository{}
+	mockEntryRepository.
+		On("Update", "154b07a0-76bd-4f85-83a5-5090cbf46552", mock.MatchedBy(
+			func(e *domain.Entry) bool { return true },
+		)).
+		Return(nil)
+	mockEntryRepository.
+		On("Update", "invalid", mock.MatchedBy(
+			func(e *domain.Entry) bool { return true },
+		)).
+		Return(errors.New("error"))
+
+	service := New(mockEntryRepository)
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			err := service.Update(test.inputId, test.inputEntry)
+			assert.Equal(t, test.err, err != nil)
+		})
+	}
+}
