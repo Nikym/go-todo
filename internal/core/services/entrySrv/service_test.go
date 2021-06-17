@@ -9,31 +9,25 @@ import (
 	"testing"
 )
 
-type TestEntry struct {
-	Name     string
-	Input    interface{}
-	Expected interface{}
-	Err      bool
-}
-
 func TestService_Get(t *testing.T) {
-	tests := []TestEntry{
+	tests := []struct {
+		name                string
+		input               string
+		expectedTitle       string
+		expectedDescription string
+		err                 bool
+	}{
 		{
-			Name:  "should return an entry when given valid id",
-			Input: "17beccd2-c5e8-4744-9b5f-98163b4a479d",
-			Expected: &domain.Entry{
-				ID:          "17beccd2-c5e8-4744-9b5f-98163b4a479d",
-				Title:       "Test Title",
-				Description: "Test Desc",
-				Done:        false,
-			},
-			Err: false,
+			name:                "should return an entry when given valid id",
+			input:               "17beccd2-c5e8-4744-9b5f-98163b4a479d",
+			expectedTitle:       "Test Title",
+			expectedDescription: "Test Description",
+			err:                 false,
 		},
 		{
-			Name:     "should return error when given invalid id",
-			Input:    "invalid",
-			Expected: &domain.Entry{},
-			Err:      true,
+			name:  "should return error when given invalid id",
+			input: "invalid",
+			err:   true,
 		},
 	}
 
@@ -43,7 +37,7 @@ func TestService_Get(t *testing.T) {
 		Return(&domain.Entry{
 			ID:          "17beccd2-c5e8-4744-9b5f-98163b4a479d",
 			Title:       "Test Title",
-			Description: "Test Desc",
+			Description: "Test Description",
 			Done:        false,
 		}, nil)
 	mockEntryRepository.
@@ -53,42 +47,46 @@ func TestService_Get(t *testing.T) {
 	service := New(mockEntryRepository)
 
 	for _, test := range tests {
-		t.Run(test.Name, func(t *testing.T) {
-			actual, err := service.Get(test.Input.(string))
-
-			assert.EqualValues(t, test.Expected, actual)
-			assert.Equal(t, test.Err, err != nil)
+		t.Run(test.name, func(t *testing.T) {
+			actual, err := service.Get(test.input)
+			if err != nil {
+				assert.True(t, test.err)
+			} else {
+				assert.IsType(t, &domain.Entry{}, actual)
+				assert.Equal(t, test.expectedTitle, actual.Title)
+				assert.Equal(t, test.expectedDescription, actual.Description)
+			}
 		})
 	}
 }
 
 func TestService_Create(t *testing.T) {
-	type input struct {
-		title       string
-		description string
-	}
-	tests := []TestEntry{
+	tests := []struct {
+		name                string
+		inputTitle          string
+		inputDescription    string
+		expectedTitle       string
+		expectedDescription string
+		err                 bool
+	}{
 		{
-			Name: "should create new entry and return domain.Entry object on valid input",
-			Input: input{
-				title:       "Test Title",
-				description: "Test Description",
-			},
-			Expected: &domain.Entry{
-				Title:       "Test Title",
-				Description: "Test Description",
-				Done:        false,
-			},
-			Err: false,
+			name:                "should create new entry and return domain.Entry object on valid input",
+			inputTitle:          "Test Title",
+			inputDescription:    "Test Description",
+			expectedTitle:       "Test Title",
+			expectedDescription: "Test Description",
+			err:                 false,
 		},
 		{
-			Name: "should return error when repository cannot be accessed",
-			Input: input{
-				title:       "Error",
-				description: "Error",
-			},
-			Expected: &domain.Entry{},
-			Err:      true,
+			name:             "should return error when repository cannot be accessed",
+			inputTitle:       "Error",
+			inputDescription: "Error",
+			err:              true,
+		},
+		{
+			name:       "should return error when title is less than 3 chars long",
+			inputTitle: "te",
+			err:        true,
 		},
 	}
 
@@ -107,17 +105,14 @@ func TestService_Create(t *testing.T) {
 	service := New(mockEntryRepository)
 
 	for _, test := range tests {
-		in := test.Input.(input)
-		t.Run(test.Name, func(t *testing.T) {
-			actual, err := service.Create(in.title, in.description)
+		t.Run(test.name, func(t *testing.T) {
+			actual, err := service.Create(test.inputTitle, test.inputDescription)
 			if err != nil {
-				assert.True(t, test.Err)
+				assert.True(t, test.err)
 			} else {
-				expected := test.Expected.(*domain.Entry)
-
 				assert.IsType(t, &domain.Entry{}, actual)
-				assert.Equal(t, expected.Title, actual.Title)
-				assert.Equal(t, expected.Description, actual.Description)
+				assert.Equal(t, test.expectedTitle, actual.Title)
+				assert.Equal(t, test.expectedDescription, actual.Description)
 			}
 		})
 	}
