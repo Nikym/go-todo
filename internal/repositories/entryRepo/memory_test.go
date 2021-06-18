@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-var repo *memKVS = NewMemKVS()
+var repo = NewMemKVS()
 
 func setUp() {
 	exampleEntry := domain.Entry{
